@@ -1,0 +1,4 @@
+idPlanta:100 
+idHoja:1010 
+Date:2016-03-31 17-35-16 
+Folder:Experimento-2016-03-31 17-35-16 
