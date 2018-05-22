@@ -43,7 +43,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="SessionTab">
      <property name="font">
@@ -144,7 +144,7 @@ color:white;</string>
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
         <x>140</x>
@@ -195,13 +195,23 @@ color:white;</string>
        <string>Agregar</string>
       </property>
      </widget>
-     <zorder>createSessionButton</zorder>
-     <zorder>label_7</zorder>
-     <zorder>label_7</zorder>
-     <zorder>gridLayoutWidget</zorder>
-     <zorder></zorder>
-     <zorder>addFieldButton</zorder>
-     <zorder>lineEditPlanta</zorder>
+     <widget class="QPushButton" name="configButton">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>20</y>
+        <width>75</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: #2ecc71; 
+color:white;</string>
+      </property>
+      <property name="text">
+       <string>Configuracion</string>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="CameraTab">
      <attribute name="title">
@@ -390,7 +400,7 @@ color:white;</string>
      <x>0</x>
      <y>0</y>
      <width>571</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
   </widget>
