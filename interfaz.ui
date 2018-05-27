@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>571</width>
-    <height>369</height>
+    <height>500</height>
    </rect>
   </property>
   <property name="maximumSize">
@@ -39,7 +39,7 @@
       <x>0</x>
       <y>0</y>
       <width>571</width>
-      <height>331</height>
+      <height>451</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -61,8 +61,8 @@
      <widget class="QPushButton" name="createSessionButton">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>20</y>
+        <x>440</x>
+        <y>280</y>
         <width>91</width>
         <height>31</height>
        </rect>
@@ -78,8 +78,8 @@ color:white;</string>
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>50</y>
+        <x>80</x>
+        <y>70</y>
         <width>171</width>
         <height>39</height>
        </rect>
@@ -100,55 +100,11 @@ color:white;</string>
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QWidget" name="gridLayoutWidget">
-      <property name="geometry">
-       <rect>
-        <x>30</x>
-        <y>90</y>
-        <width>501</width>
-        <height>86</height>
-       </rect>
-      </property>
-      <layout class="QGridLayout" name="gridLayout_3">
-       <item row="0" column="0">
-        <widget class="QLabel" name="idPlataLabel">
-         <property name="text">
-          <string>ID Planta</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>ID Hoja</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QLineEdit" name="lineEditHoja">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit{
-	margin: 5px 0px 5px 0px; 
-}</string>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="lineEditPlanta">
-         <property name="styleSheet">
-          <string notr="true">QLineEdit{
-	margin: 5px 0px 5px 0px; 
-}</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
      <widget class="QWidget" name="layoutWidget">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>230</y>
+        <x>130</x>
+        <y>360</y>
         <width>309</width>
         <height>41</height>
        </rect>
@@ -181,9 +137,9 @@ color:white;</string>
      <widget class="QPushButton" name="addFieldButton">
       <property name="geometry">
        <rect>
-        <x>40</x>
-        <y>180</y>
-        <width>71</width>
+        <x>440</x>
+        <y>200</y>
+        <width>91</width>
         <height>31</height>
        </rect>
       </property>
@@ -198,9 +154,9 @@ color:white;</string>
      <widget class="QPushButton" name="configButton">
       <property name="geometry">
        <rect>
-        <x>470</x>
-        <y>20</y>
-        <width>75</width>
+        <x>440</x>
+        <y>130</y>
+        <width>91</width>
         <height>31</height>
        </rect>
       </property>
@@ -210,6 +166,48 @@ color:white;</string>
       </property>
       <property name="text">
        <string>Configuracion</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tableWidget">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>120</y>
+        <width>271</width>
+        <height>221</height>
+       </rect>
+      </property>
+      <property name="rowCount">
+       <number>1</number>
+      </property>
+      <property name="columnCount">
+       <number>2</number>
+      </property>
+      <row/>
+      <column/>
+      <column/>
+     </widget>
+     <widget class="QPushButton" name="pathButton">
+      <property name="geometry">
+       <rect>
+        <x>60</x>
+        <y>30</y>
+        <width>93</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>directorio</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>30</y>
+        <width>321</width>
+        <height>31</height>
+       </rect>
       </property>
      </widget>
     </widget>
@@ -223,7 +221,7 @@ color:white;</string>
         <x>130</x>
         <y>50</y>
         <width>301</width>
-        <height>161</height>
+        <height>163</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="cameraContainer">
@@ -400,7 +398,7 @@ color:white;</string>
      <x>0</x>
      <y>0</y>
      <width>571</width>
-     <height>21</height>
+     <height>26</height>
     </rect>
    </property>
   </widget>

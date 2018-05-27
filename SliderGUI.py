@@ -1,12 +1,14 @@
-import sys
-import os
 import Config
-from PyQt5.QtCore import pyqtSlot
-from PyQt5.QtWidgets import QMainWindow,QApplication, QDialog,QWidget
+from PyQt5.QtWidgets import QMainWindow,QApplication, QFileDialog,QWidget,QTableWidgetItem
 from PyQt5.uic import loadUi
 from ServerSocketWrapper import *
 from SocketWrapper import *
-from PyQt5.QtGui import QIcon
+from pathlib import Path
+import json
+import sys, os
+from datetime import datetime
+import time
+from PyQt5.QtCore import Qt
 
 class SliderUI(QMainWindow):
     def __init__(self, *args):
@@ -21,6 +23,9 @@ class SliderUI(QMainWindow):
         self.cameraCaptureButton.clicked.connect(self.onClickCameraCapture)
         self.startSessionButton.clicked.connect(self.onClickStartSession)
         self.configButton.clicked.connect(self.onClickConfig)
+        self.addFieldButton.clicked.connect(self.onClickLoadFileConfig)
+        self.createSessionButton.clicked.connect(self.onClickCrear)
+        self.pathButton.clicked.connect(self.onClickSelectPath)
 
         #self.createSessionButton.setIcon(QIcon('icon/add_session.png'))
         self.createSessionButton.setStyleSheet("background-color: #2ecc71; color:white;")
@@ -32,6 +37,73 @@ class SliderUI(QMainWindow):
         self.sliderStopButton.setStyleSheet("background-color: #2ecc71; color:white;")
         self.cameraCaptureButton.setStyleSheet("background-color: #2ecc71; color:white;")
         #self.setDeviceConnections()
+
+    def onClickSelectPath(self):
+        #QFileDialog.getExistingDirectory(self, 'Select directory')
+        options = QFileDialog.DontResolveSymlinks | QFileDialog.ShowDirsOnly
+        directory = QFileDialog.getExistingDirectory(self,"Open Folder",options=options)
+        print(directory)
+        if directory:
+            self.lineEdit.setText(directory)
+
+    def onClickCrear(self):
+        #print('Experimento-%Y-%m-%d %H-%M-%S}'.format(datetime(2001, 2, 3, 4, 5)))
+        t = time.time()
+        t_str = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(t))
+        t_str=self.lineEdit.text()+"/"+"Experimiento-" + t_str
+        print(t_str)
+        if not os.path.exists(t_str):
+            os.makedirs(t_str)
+            os.makedirs(t_str+"/fotoThor")
+            os.makedirs(t_str+"/imagenesCalibracion")
+            file_config = open(t_str+"/Data_Experimento.txt", 'w', encoding='utf-8')
+            for row in range(self.tableWidget.rowCount()):
+                item1 = self.tableWidget.item(row, 0)
+                item2 = self.tableWidget.item(row, 1)
+                file_config.write(str(item1.text())+":"+str(item2.text())+"\n")
+            file_config.close()
+
+    def onClickLoadFileConfig(self):
+        #filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Test Dialog', os.getcwd(), 'All Files(*.*)')
+        #print(filename)
+        #
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
+                                                  "All Files (*);;Python Files (*.py)", options=options)
+        print(fileName)
+        if fileName:
+            my_file = Path(fileName)
+            if my_file.exists():
+                print(fileName)
+                connection_file = open(fileName, 'r')
+                conn_string = json.load(connection_file)
+                connection_file.close()
+                print(conn_string["parametros"])
+
+                self.tableWidget.setRowCount(len(conn_string["parametros"]) )
+                self.tableWidget.setColumnCount(2)
+                '''
+                self.tableWidget.setItem(0, 0, QTableWidgetItem("Cell (1,1)"))
+                self.tableWidget.setItem(0, 1, QTableWidgetItem("Cell (1,2)"))
+                self.tableWidget.setItem(1, 0, QTableWidgetItem("Cell (2,1)"))
+                self.tableWidget.setItem(1, 1, QTableWidgetItem("Cell (2,2)"))
+                self.tableWidget.setItem(2, 0, QTableWidgetItem("Cell (3,1)"))
+                self.tableWidget.setItem(2, 1, QTableWidgetItem("Cell (3,2)"))
+                self.tableWidget.setItem(3, 0, QTableWidgetItem("Cell (4,1)"))
+                self.tableWidget.setItem(3, 1, QTableWidgetItem("Cell (4,2)"))
+                #self.tableWidget.move(0, 0)'''
+                #self.tableWidget.setRowCount(len(conn_string["parametros"])+1)
+                #num_row = len(conn_string["parametros"])
+                num_row = 0
+                for parametro in conn_string["parametros"]:
+                    #self.tableWidget.inserRow(num_row)
+                    print(str(num_row))
+                    item = QTableWidgetItem(parametro)
+                    item.setFlags(Qt.ItemIsEnabled)
+                    self.tableWidget.setItem(num_row, 0, QTableWidgetItem(item))
+                    self.tableWidget.setItem(num_row, 1, QTableWidgetItem(""))
+                    num_row = num_row+1
 
     def onClickConfig(self):
         print("Permission granted!")
