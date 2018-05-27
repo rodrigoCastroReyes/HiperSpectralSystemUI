@@ -10,7 +10,7 @@ class ServerSocketWrapper(object):
     def listen(self):
         self.socket.bind((self.ip_addr,self.port))
         self.socket.listen(1)
-        self.finish = True
+        self.begin = True
 
     def accept(self):
         return self.socket.accept()

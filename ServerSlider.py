@@ -1,32 +1,40 @@
 import math
 import sys
 import os
-from ServerSocketWrapper import *
+from SocketWrapper import *
 from Slider import *
 import json
+import random
+import time
+from PyQt5.QtCore import QThread
+from PyQt5.QtWidgets import QApplication
 
-class ServerSlider(ServerSocketWrapper):
-	"""docstring for ServerSlider"""
-	def __init__(self,slider,ip,port):
-		super(ServerSlider, self).__init__(ip,port)
+class SliderSocket(ClientSocket,QThread):
+
+	def __init__(self,slider,parent=None):
+		ClientSocket.__init__(self)
+		QThread.__init__(self, parent)
 		self.slider = slider
 
-	def start(self):#wait for connections
+	def run(self):
+		self.send("SLIDER_CONNECT")
 		while True:
-			print("Waiting to connect")
-			(clientsocket, address) = self.accept()
-			self.run(clientsocket)
-		
-	def run(self,client):
-		while True:
-			msg = self.receive(client)
-			command = msg.split(':')[0]
-			if command in ['SLIDER_HOME','SLIDER_MOVE','SLIDER_STOP']:
-				self.slider.setAction(msg)
-				self.slider.start()
-				self.send(client,"SLIDER_ACK")
-			else:
-				break
+			msg = self.receive()
+			if len(msg) > 0:
+				print(msg)
+				command = msg.split(':')[0]
+				if not(command in ['SLIDER_HOME','SLIDER_MOVE','SLIDER_STOP']):
+					continue
+				if command == "SLIDER_HOME":
+					#self.slider.setAction(msg)
+					#self.slider.start()
+					t = random.randint(10, 20) 
+					time.sleep(t)
+					self.send("SLIDER_HOME_OK")
+				elif command == "SLIDER_MOVE":
+					t = random.randint(5, 10) 
+					time.sleep(t)
+					self.send("SLIDER_MOVE_OK")
 
 def loadConfiguration(filename):
 	with open(filename) as data_file:
@@ -36,7 +44,7 @@ def loadConfiguration(filename):
 
 if __name__ == '__main__':
 	filename = sys.argv[1]
-	
+	app = QApplication(sys.argv)
 	config = loadConfiguration(filename)
 	velocity = config["velocity"]
 	offset = config["offset"]
@@ -46,9 +54,14 @@ if __name__ == '__main__':
 	port = int(config["port"])
 
 	slider = SerialSlider(velocity,offset,distance)
+	#slider.init(device)
+	client = SliderSocket(slider)
+	client.connect(ip,port)
+	client.start()
+	sys.exit(app.exec_())
+	
+	"""
 	if(slider.init(device)):
-		server = ServerSlider(slider,ip,port)
-		server.listen()
-		server.start()
 	else:
 		print("No se puede conectar a %s"%(device))
+	"""

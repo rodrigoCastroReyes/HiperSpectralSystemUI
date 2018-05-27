@@ -2,7 +2,7 @@
 	"config": {
 		"name": "Server RIP",
 		"ip": "localhost",
-		"port":"7778",
+		"port":"9090",
 		"device" : "/dev/ttyUSB0",
 		"velocity": 4.37,
 		"distance": 180, 

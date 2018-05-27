@@ -29,7 +29,8 @@ class SliderUI(QMainWindow):
 		self.sliderMoveButton.setStyleSheet("background-color: #2ecc71; color:white;")
 		self.sliderStopButton.setStyleSheet("background-color: #2ecc71; color:white;")
 		self.cameraCaptureButton.setStyleSheet("background-color: #2ecc71; color:white;")
-		self.setDeviceConnections()
+		#self.setDeviceConnections()
+
 
 	def setDeviceConnections(self):
 		if(not(self.connectToSlider())):
