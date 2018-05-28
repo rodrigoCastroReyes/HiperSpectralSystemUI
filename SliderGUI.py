@@ -78,6 +78,7 @@ class SliderUI(QMainWindow):
                 item2 = self.tableWidget.item(row, 1)
                 file_config.write(str(item1.text())+":"+str(item2.text())+"\n")
             file_config.close()
+            self.lineEdit.setText(t_str)
 
     def onClickLoadFileConfig(self):
         #filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Test Dialog', os.getcwd(), 'All Files(*.*)')
