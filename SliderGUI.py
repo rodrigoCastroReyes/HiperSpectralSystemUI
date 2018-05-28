@@ -1,13 +1,10 @@
-import Config
+import Config, inspect, os, sys, json, time
 from PyQt5.QtWidgets import QMainWindow,QApplication, QFileDialog,QWidget,QTableWidgetItem
 from PyQt5.uic import loadUi
 from ServerSocketWrapper import *
 from SocketWrapper import *
 from pathlib import Path
-import json
-import sys, os
 from datetime import datetime
-import time
 from PyQt5.QtCore import Qt
 
 class SliderUI(QMainWindow):
@@ -36,6 +33,24 @@ class SliderUI(QMainWindow):
         self.sliderMoveButton.setStyleSheet("background-color: #2ecc71; color:white;")
         self.sliderStopButton.setStyleSheet("background-color: #2ecc71; color:white;")
         self.cameraCaptureButton.setStyleSheet("background-color: #2ecc71; color:white;")
+
+        default_file = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        connection_file = open(default_file + "/parametros.json", 'r')
+        conn_string = json.load(connection_file)
+        connection_file.close()
+        self.tableWidget.setRowCount(len(conn_string["parametros"]))
+        self.tableWidget.setColumnCount(2)
+        # self.tableWidget.setRowCount(len(conn_string["parametros"])+1)
+        # num_row = len(conn_string["parametros"])
+        num_row = 0
+        for parametro in conn_string["parametros"]:
+            # self.tableWidget.inserRow(num_row)
+            print(str(num_row))
+            item = QTableWidgetItem(parametro)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tableWidget.setItem(num_row, 0, QTableWidgetItem(item))
+            self.tableWidget.setItem(num_row, 1, QTableWidgetItem(""))
+            num_row = num_row + 1
         #self.setDeviceConnections()
 
     def onClickSelectPath(self):
@@ -56,6 +71,7 @@ class SliderUI(QMainWindow):
             os.makedirs(t_str)
             os.makedirs(t_str+"/fotoThor")
             os.makedirs(t_str+"/imagenesCalibracion")
+            self.cameraThorDirectory.setText(t_str+"/imagenesCalibracion")
             file_config = open(t_str+"/Data_Experimento.txt", 'w', encoding='utf-8')
             for row in range(self.tableWidget.rowCount()):
                 item1 = self.tableWidget.item(row, 0)
@@ -67,6 +83,8 @@ class SliderUI(QMainWindow):
         #filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Test Dialog', os.getcwd(), 'All Files(*.*)')
         #print(filename)
         #
+        #print(inspect.getfile(inspect.currentframe()) ) # script filename (usually with path)
+        print(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) ) # script directory
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
@@ -75,24 +93,11 @@ class SliderUI(QMainWindow):
         if fileName:
             my_file = Path(fileName)
             if my_file.exists():
-                print(fileName)
                 connection_file = open(fileName, 'r')
                 conn_string = json.load(connection_file)
                 connection_file.close()
-                print(conn_string["parametros"])
-
                 self.tableWidget.setRowCount(len(conn_string["parametros"]) )
                 self.tableWidget.setColumnCount(2)
-                '''
-                self.tableWidget.setItem(0, 0, QTableWidgetItem("Cell (1,1)"))
-                self.tableWidget.setItem(0, 1, QTableWidgetItem("Cell (1,2)"))
-                self.tableWidget.setItem(1, 0, QTableWidgetItem("Cell (2,1)"))
-                self.tableWidget.setItem(1, 1, QTableWidgetItem("Cell (2,2)"))
-                self.tableWidget.setItem(2, 0, QTableWidgetItem("Cell (3,1)"))
-                self.tableWidget.setItem(2, 1, QTableWidgetItem("Cell (3,2)"))
-                self.tableWidget.setItem(3, 0, QTableWidgetItem("Cell (4,1)"))
-                self.tableWidget.setItem(3, 1, QTableWidgetItem("Cell (4,2)"))
-                #self.tableWidget.move(0, 0)'''
                 #self.tableWidget.setRowCount(len(conn_string["parametros"])+1)
                 #num_row = len(conn_string["parametros"])
                 num_row = 0
