@@ -6,6 +6,10 @@ from SocketWrapper import *
 from pathlib import Path
 from datetime import datetime
 from PyQt5.QtCore import Qt
+import aioftpclient
+from ftp import FtpClient
+import asyncio
+import MyThread
 
 class SliderUI(QMainWindow):
     def __init__(self, *args):
@@ -23,6 +27,7 @@ class SliderUI(QMainWindow):
         self.addFieldButton.clicked.connect(self.onClickLoadFileConfig)
         self.createSessionButton.clicked.connect(self.onClickCrear)
         self.pathButton.clicked.connect(self.onClickSelectPath)
+        self.pushButton.clicked.connect(self.onClickPushButton)
 
         #self.createSessionButton.setIcon(QIcon('icon/add_session.png'))
         self.createSessionButton.setStyleSheet("background-color: #2ecc71; color:white;")
@@ -52,6 +57,40 @@ class SliderUI(QMainWindow):
             self.tableWidget.setItem(num_row, 1, QTableWidgetItem(""))
             num_row = num_row + 1
         #self.setDeviceConnections()
+
+    def worker(self, inval):
+        print("in worker, received '%s'" % inval)
+        #time.sleep(5)
+        aioftpclient.prueba2()
+        #asyncio.wait(aioftpclient.subir_datos())
+        #loop = asyncio.get_event_loop()
+        #tasks = (aioftpclient.subir_datos(),)
+
+        #ftp = aioftp.Aioftp()
+        #loop.run_until_complete(asyncio.wait(tasks))
+        #asyncio.wait(tasks)
+        return "%s worked" % inval
+
+    def end_send(self, cmd):
+        print("send returned '%s'" % cmd)
+
+    def onClickPushButton(self):
+        #ftp = FtpClient()
+        #ftp.rx_ython()
+        #loop = asyncio.get_event_loop()
+        #tasks = (aioftp.subir_datos(),)
+
+        # ftp = Aioftp()
+        #loop.run_until_complete(asyncio.wait(tasks))
+        print("Kicked off thread")
+        #loop = asyncio.new_event_loop()
+        #asyncio.set_event_loop(loop)
+        #future = asyncio.ensure_future(aioftpclient.subir_datos())  # tasks to do
+        #loop.run_until_complete(future)  # loop until done
+        #t = MyThread.MyThread(self, self.worker, "some val")
+        t = MyThread.MyThread2( "sdfg")
+        t.start()
+        print("Kicked off thread")
 
     def onClickSelectPath(self):
         #QFileDialog.getExistingDirectory(self, 'Select directory')
