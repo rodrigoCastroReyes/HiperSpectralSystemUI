@@ -9,35 +9,35 @@ class ClientMock(threading.Thread):
 		threading.Thread.__init__(self,name=threadName)
 		self.name = threadName
 		self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		self.connection.connect(('200.126.20.61', 7777))
+		self.connection.connect(('localhost', 9090))
 
 	def message_received(self):
-		return self.connection.recv(1024)
+		return self.connection.recv(1024).decode()
 
 	def run(self):
-		#inpt = raw_input('type anything and click enter... ')
-		self.connection.send(self.name + "_CONECTAR")
-		while True:
-			response = self.message_received()
-			if len(response) > 0:
-				print response
-				if response == "CARPETA":
-					print "entro"
-					t = random.randint(10, 20) 
-					time.sleep(t)
-					self.connection.send(self.name + "_CARPETA_OK")
-					time.sleep(60)
-					self.connection.send(self.name + "_EXIT")
-					self.connection.close()
-					break
-					print "conexion cerrada"
+		self.connection.send((self.name + "_CONNECT").encode())
+		print("Waiting for commands")
+		try:
+			while True:
+				msg = self.message_received()
+				if len(msg) > 0:
+					print (msg)
+					#response = response.rstrip('\n')
+					command = msg.split(':')[0]
+					if command == "THOR_CAPTURE":
+						t = random.randint(2, 5) 
+						time.sleep(t)
+						self.connection.send(("THOR_CAPTURE_OK").encode())
+		except KeyboardInterrupt:
+   			print('interrupted!')
 
 if __name__ == '__main__':
 	thor = ClientMock("THOR")
 	thor.start()
-
+	"""
 	termica = ClientMock("TERMICA")
 	termica.start()
 
 	firmewire = ClientMock("FIRMEWIRE")
 	firmewire.start()
+	"""

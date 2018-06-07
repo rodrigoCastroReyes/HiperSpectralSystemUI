@@ -5,6 +5,9 @@ import signal
 
 class ClientSocket(object):
     
+    def __init__(self,connection = None):
+        self.connection = connection
+
     def connect(self,host,port):
         try:
             self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
