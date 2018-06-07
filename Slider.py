@@ -3,7 +3,7 @@ from time import sleep
 import math
 import serial
 from observable import Observable
-from PyQt4.QtCore import *
+from PyQt5.QtCore import *
 
 class SliderStates:
 	HOMED,READY,DONE = range(3)
@@ -45,7 +45,9 @@ class Slider(Observable, QThread):
 	def setVelocity(self,vel):
 		self.velocity = vel
 
-		def checkCurrentPosition(self):
+	def checkCurrentPosition(self):
+		pass
+		"""
 		currentPosition = self.getCurrentPosition()
 		firstStop = currentPosition + offset 
 		finalStop = currentPosition + offset + distance
@@ -64,6 +66,7 @@ class Slider(Observable, QThread):
 					#self.update_observers(state = MachineState.DONE)
 					break
 			self.position += 1
+		"""
 
 class SerialSlider(Slider):
 
@@ -79,12 +82,19 @@ class SerialSlider(Slider):
 			print (e)
 			return False
 	
-	def setAction(self,msg):
+	def setAction(self,msg,context):
 		self.action = msg
+		self.context = context
 
 	def run(self):
 		print("doing ",self.action)
 		self.send(self.action)
+		print("waiting for serial")
+		#tdata = self.channel.read()
+		#print("waiting for serial 2")
+		line = self.channel.readline().decode("utf-8")
+		line = line.rstrip('\n')
+		self.context.send(line)
 		#wait for response
 		
 	def send(self,msg):
