@@ -1,9 +1,9 @@
 {
 	"config": {
 		"name": "Server RIP",
-		"ip": "200.126.1.181",
+		"ip": "200.126.1.162",
 		"port":"9090",
-		"device" : "/dev/ttyUSB0",
+		"device" : "COM3",
 		"velocity": 4.37,
 		"distance": 180, 
 		"offset": 30.6

@@ -1,0 +1,10 @@
+word = []
+			for c in self.channel.read():
+				word.append(c)
+				if c == '\n':
+					print("Line: " + line)
+				else:
+					print("Character " + str(c))
+				time.sleep(1)
+			#line = self.channel.readline()
+			#

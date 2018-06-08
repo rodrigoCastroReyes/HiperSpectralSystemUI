@@ -79,6 +79,7 @@ class LinkerSlider(Linker):
 
 	def moveACK(self,result):
 		if result:
+			print("SLIDER_MOVE_OK")
 			self.notify()
 
 	def notify(self):

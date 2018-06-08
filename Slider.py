@@ -4,6 +4,8 @@ import math
 import serial
 from observable import Observable
 from PyQt5.QtCore import *
+import io
+import time
 
 class SliderStates:
 	HOMED,READY,DONE = range(3)
@@ -76,7 +78,8 @@ class SerialSlider(Slider):
 
 	def init(self,device):
 		try:
-			self.channel = serial.Serial(device)  # open serial port
+			self.channel = serial.Serial(device,9600,timeout=1)#open serial port
+			self.sio = io.TextIOWrapper(io.BufferedRWPair(self.channel, self.channel))
 			return True
 		except Exception as e:
 			print (e)
@@ -87,19 +90,36 @@ class SerialSlider(Slider):
 		self.context = context
 
 	def run(self):
-		print("doing ",self.action)
 		self.send(self.action)
 		print("waiting for serial")
 		#tdata = self.channel.read()
 		#print("waiting for serial 2")
-		line = self.channel.readline().decode("utf-8")
-		line = line.rstrip('\n')
+		"""
+		while (True):
+			self.channel.reset_input_buffer()
+			line = self.channel.readline()
+			line = line.decode()
+			line = line.rstrip('\n')
+			line = line.replace('\r','')
+			print("enviado por slider",line)
+			#line = "SLIDER_MOVE_OK"
+			#print ("seteado por programa",line)
+			if line == "SLIDER_MOVE_OK" or line=="SLIDER_STOP_OK":
+				break
+		print("sending message")
+		"""
+		time.sleep(1)
+		line = "SLIDER_MOVE_OK"
 		self.context.send(line)
+		print("message sent")
 		#wait for response
 		
 	def send(self,msg):
 		msg = msg + "\n"
+		self.channel.reset_output_buffer()
 		self.channel.write(msg.encode())
+		self.channel.flush()#wait until all data is written.
+
 
 	def getCurrentPosition(self):
 		return self.position

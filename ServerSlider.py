@@ -21,10 +21,12 @@ class SliderSocket(ClientSocket,QThread):
 		while True:
 			msg = self.receive()
 			if len(msg) > 0:
-				print(msg)
 				command = msg.split(':')[0]
 				if not(command in ['SLIDER_HOME','SLIDER_MOVE','SLIDER_STOP']):
 					continue
+				if self.slider.isRunning():
+					self.slider.terminate()
+					self.slider.wait(100)
 				self.slider.setAction(msg,self)
 				self.slider.start()
 
@@ -35,7 +37,7 @@ def loadConfiguration(filename):
 	return config
 
 if __name__ == '__main__':
-	filename = sys.argv[1]
+	filename = "config.json"
 	app = QApplication(sys.argv)
 	config = loadConfiguration(filename)
 	velocity = config["velocity"]
