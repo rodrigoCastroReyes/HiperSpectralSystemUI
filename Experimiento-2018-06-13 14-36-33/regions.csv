@@ -1,9 +1,0 @@
-label,px,py,rx,ry,color,estadio
-R11,45,161,9,9,#502d16,necrotica
-R12,58,164,9,9,#502d16,necrotica
-R13,70,173,9,9,#ffcc00ff,necrotica
-R14,42,179,8,8,#ffcc00ff,lesionada
-R15,52,179,8,8,#ffcc00ff,lesionada
-R16,55,145,8,8,#00aa00,sana(inoculada)
-R17,65,147,8,8,#00aa00,sana(inoculada)
-R18,74,153,9,9,#00aa00,sana(inoculada)
