@@ -1,9 +1,9 @@
 {
 	"config": {
 		"name": "Server RIP",
-		"ip": "200.126.1.162",
+		"ip": "localhost",
 		"port":"9090",
-		"device" : "COM3",
+		"device" : "/dev/ttyACM0",
 		"velocity": 4.37,
 		"distance": 180, 
 		"offset": 30.6

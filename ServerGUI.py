@@ -5,6 +5,7 @@ import json
 import time
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
+import Config, inspect, os, sys, json, time
 from PyQt5.QtWidgets import QMainWindow,QApplication, QFileDialog,QWidget,QTableWidgetItem
 from PyQt5.uic import loadUi
 from ServerSocketWrapper import *
@@ -13,6 +14,11 @@ from PyQt5.QtGui import QIcon
 from ServerA2M2 import *
 from pathlib import Path
 from datetime import datetime
+from ftplib import FTP
+from rx import Observable
+from rx.concurrency import NewThreadScheduler
+import qtmodern.styles
+import qtmodern.windows
 
 class ModeOperation(QThread):
 
@@ -32,7 +38,9 @@ class StepsModeOperation(ModeOperation):
         self.start()
 
     def run(self):
-        pathDir = r"C:\Users\BDI\Desktop\exp\prueba_"
+        #pathDir = r"C:\Users\BDI\Desktop\exp\prueba_"
+        pathDir = self.context.getThorDirectory()
+        print ("Escribiendo datos en %s "%(pathDir))
         i = 0
         n_images = 10
         #self.context.server.doHome()
@@ -52,6 +60,7 @@ class ServerGUI(QMainWindow):
     def __init__(self, *args):
         super(ServerGUI, self).__init__(*args)
         loadUi('interfaz.ui', self)
+        self.experiment_directory = ""
         self.initUIComponents()
         self.loadConfiguration("config_server.json")
         self.server = ServerA2M2(self.ip,self.port)
@@ -68,31 +77,36 @@ class ServerGUI(QMainWindow):
         #QFileDialog.getExistingDirectory(self, 'Select directory')
         options = QFileDialog.DontResolveSymlinks | QFileDialog.ShowDirsOnly
         directory = QFileDialog.getExistingDirectory(self,"Open Folder",options=options)
-        print(directory)
         if directory:
             self.lineEdit.setText(directory)
 
-    def onClickCrear(self):
-        #print('Experimento-%Y-%m-%d %H-%M-%S}'.format(datetime(2001, 2, 3, 4, 5)))
+    def getThorDirectory(self):
+        return self.thor_directory
+
+    def onClickCreate(self):
         t = time.time()
         t_str = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(t))
-        t_str=self.lineEdit.text()+"/"+"Experimiento-" + t_str
-        print(t_str)
+        t_str = self.lineEdit.text()+"/"+"Experimiento-" + t_str
+        self.experiment_directory = t_str
+        self.thor_directory = os.path.join(t_str,"fotoThor")
+        self.calibration_directory = os.path.join(t_str,"imagenesCalibracion")
         if not os.path.exists(t_str):
-            os.makedirs(t_str)
-            os.makedirs(t_str+"/fotoThor")
-            os.makedirs(t_str+"/imagenesCalibracion")
+            os.makedirs(self.experiment_directory)
+            os.makedirs(self.thor_directory)
+            os.makedirs(self.calibration_directory)
+            self.cameraThorDirectory.setText(self.calibration_directory)
             file_config = open(t_str+"/Data_Experimento.txt", 'w', encoding='utf-8')
             for row in range(self.tableWidget.rowCount()):
                 item1 = self.tableWidget.item(row, 0)
                 item2 = self.tableWidget.item(row, 1)
                 file_config.write(str(item1.text())+":"+str(item2.text())+"\n")
             file_config.close()
+            self.lineEdit.setText(t_str)
 
     def onClickLoadFileConfig(self):
         #filename = QtWidgets.QFileDialog.getOpenFileName(None, 'Test Dialog', os.getcwd(), 'All Files(*.*)')
         #print(filename)
-        #
+        print(os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe()))) ) # script directory
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         fileName, _ = QFileDialog.getOpenFileName(self, "QFileDialog.getOpenFileName()", "",
@@ -109,16 +123,6 @@ class ServerGUI(QMainWindow):
 
                 self.tableWidget.setRowCount(len(conn_string["parametros"]) )
                 self.tableWidget.setColumnCount(2)
-                '''
-                self.tableWidget.setItem(0, 0, QTableWidgetItem("Cell (1,1)"))
-                self.tableWidget.setItem(0, 1, QTableWidgetItem("Cell (1,2)"))
-                self.tableWidget.setItem(1, 0, QTableWidgetItem("Cell (2,1)"))
-                self.tableWidget.setItem(1, 1, QTableWidgetItem("Cell (2,2)"))
-                self.tableWidget.setItem(2, 0, QTableWidgetItem("Cell (3,1)"))
-                self.tableWidget.setItem(2, 1, QTableWidgetItem("Cell (3,2)"))
-                self.tableWidget.setItem(3, 0, QTableWidgetItem("Cell (4,1)"))
-                self.tableWidget.setItem(3, 1, QTableWidgetItem("Cell (4,2)"))
-                #self.tableWidget.move(0, 0)'''
                 #self.tableWidget.setRowCount(len(conn_string["parametros"])+1)
                 #num_row = len(conn_string["parametros"])
                 num_row = 0
@@ -145,22 +149,68 @@ class ServerGUI(QMainWindow):
         self.sliderStopButton.clicked.connect(self.onClickSliderStop)
         self.cameraCaptureButton.clicked.connect(self.onClickCameraCapture)
         self.startSessionButton.clicked.connect(self.onClickStartSession)
-        
         self.configButton.clicked.connect(self.onClickConfig)
         self.addFieldButton.clicked.connect(self.onClickLoadFileConfig)
-        self.createSessionButton.clicked.connect(self.onClickCrear)
+        self.createSessionButton.clicked.connect(self.onClickCreate)
         self.pathButton.clicked.connect(self.onClickSelectPath)
+        self.uploadSessionButton.clicked.connect(self.onClickUploadSession)
 
-        #self.createSessionButton.setIcon(QIcon('icon/add_session.png'))
-        self.createSessionButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.startSessionButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.cancelSessionButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.addFieldButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.sliderHomeButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.sliderMoveButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.sliderStopButton.setStyleSheet("background-color: #2ecc71; color:white;")
-        self.cameraCaptureButton.setStyleSheet("background-color: #2ecc71; color:white;")
+        default_file = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+        connection_file = open(default_file + "/parametros.json", 'r')
+        conn_string = json.load(connection_file)
+        connection_file.close()
+        self.tableWidget.setRowCount(len(conn_string["parametros"]))
+        self.tableWidget.setColumnCount(2)
+        # self.tableWidget.setRowCount(len(conn_string["parametros"])+1)
+        # num_row = len(conn_string["parametros"])
+        num_row = 0
+        for parametro in conn_string["parametros"]:
+            # self.tableWidget.inserRow(num_row)
+            item = QTableWidgetItem(parametro)
+            item.setFlags(Qt.ItemIsEnabled)
+            self.tableWidget.setItem(num_row, 0, QTableWidgetItem(item))
+            self.tableWidget.setItem(num_row, 1, QTableWidgetItem(""))
+            num_row = num_row + 1
 
+    def upload_files(self,parent_path,server_path,my_ftp):
+        print("directorio actual %s"%my_ftp.pwd())
+        #print(server_path)
+        files = os.listdir(parent_path)
+        for file in files:
+            full_path = os.path.join(parent_path,file)
+            if os.path.isfile(full_path):
+                fh = open(full_path, 'rb')
+                my_ftp.storbinary('STOR %s' % file, fh)
+                fh.close()
+            elif os.path.isdir(full_path):
+                my_ftp.mkd(file)
+                my_ftp.cwd(file)
+                self.upload_files(full_path,file,my_ftp)
+        my_ftp.cwd('..')
+
+    def launch_upload_thread(self,my_ftp):
+        local_parent_path = self.experiment_directory
+        folder_name = local_parent_path.split("/")[-1]
+        server_path = os.path.join("/home/rodfcast/Experimentos",folder_name)
+        my_ftp.mkd(server_path)
+        my_ftp.cwd(server_path)
+        scheduler = NewThreadScheduler()
+        #scheduler.schedule(lambda sch,state : self.upload_files(local_parent_path,server_path,my_ftp))
+
+        Observable.from_([local_parent_path]) \
+            .subscribe_on(scheduler) \
+            .map(lambda x: self.upload_files(x,server_path,my_ftp)) \
+            .subscribe(on_error=lambda e: print(e),
+                       on_completed=lambda: my_ftp.close())
+
+    def onClickUploadSession(self):
+        server = '127.0.0.1'
+        username = 'rodfcast'
+        password = '2487'
+        print("inicio de subida")
+        my_ftp = FTP(server, username, password)
+        self.launch_upload_thread(my_ftp)
+        print("fin de subida")
 
     def onClickStartSession(self):
         print("algoritmo de adquisión de imágenes")
@@ -196,6 +246,8 @@ class ServerGUI(QMainWindow):
         self.server.doStop()
     
 app = QApplication(sys.argv)
+qtmodern.styles.dark(app)
 widget = ServerGUI()
-widget.show()
+mw = qtmodern.windows.ModernWindow(widget)
+mw.show()
 sys.exit(app.exec_())
