@@ -3,7 +3,8 @@ from PyQt5.QtGui  import *
 from PyQt5.QtWidgets import *
 from QtImageViewer import QtImageViewer
 import sys
-
+from libtiff import TIFF
+import re
 
 def handleLeftClick(x, y):
     row = int(y)
@@ -24,6 +25,7 @@ class MyMainWindow(QMainWindow):
         fileName, _ = QFileDialog.getOpenFileName(self, "Open File",
                 QDir.currentPath())
         if fileName:
+            print(fileName)
             image = QImage(fileName)
             if image.isNull():
                 QMessageBox.information(self, "Image Viewer",
@@ -106,14 +108,19 @@ class FormWidget2(QWidget):
 
         # Allow panning with left mouse button.
         self.viewer.canPan = True
-
+        
         # Load an image to be displayed.
         if QT_VERSION_STR[0] == '4':
             fileName = QFileDialog.getOpenFileName(None, "Open image file...")
         elif QT_VERSION_STR[0] == '5':
             fileName, dummy = QFileDialog.getOpenFileName(None, "Open image file...")
-        image = QImage(fileName)
-
+        
+        #fileName = "/home/rodfcast/Documents/CVR/Proyecto Investigacion/dataset/Experimento-2016-04-29 18-24-24/fotoThor/planta40-11-30-58.tif"
+        print(fileName)
+        if re.search(".tif",fileName) != None:
+            image = self.getImage(fileName)#soporte para leer imagenes tif RGB
+        else:
+            image = QImage(fileName)
         # Display the image in the viewer.
         self.viewer.setImage(image)
 
@@ -129,6 +136,32 @@ class FormWidget2(QWidget):
         self.layout.addWidget(self.viewer)
 
         self.setLayout(self.layout)
+
+    def getImage(self,fileName):
+        #image = tiff.imread(fileName)
+        tif = TIFF.open(fileName, mode='r')
+        # to read an image in the currect TIFF directory and return it as numpy array:
+        image = tif.read_image()
+        if len(image.shape) >2 :
+            rows,cols,channels = image.shape
+            qimage = QImage(cols, rows, QImage.Format_RGB32)
+            for i in range(0, rows):
+                for j in range(0, cols):
+                    valueBGR =  image[i,j]
+                    value = qRgb(valueBGR[0], valueBGR[1], valueBGR[2])
+                    qimage.setPixel(j, i, value)
+        else:
+            rows,cols = image.shape
+            qimage = QPixmap(cols, rows,QImage.Format_Grayscale8)
+            
+            for i in range(0, rows):
+                for j in range(0, cols):
+                    value = qGray(image[i,j])
+                    qimage.setPixel(j, i, value)
+            
+
+        return qimage
+
 
     def handleLeftClick(self,x, y):
         row = int(y)
