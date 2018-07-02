@@ -16,15 +16,16 @@ class ServerA2M2(ServerSocketWrapper,QThread):
         self.linkerSlider = LinkerSlider(self.sliderMutex,self.sliderCondition)
 
     def doStop(self):
-        msg = "SLIDER_STOP:\n"
+        msg = "SLIDER_STOP:"
         self.linkerSlider.sendAction(msg)
 
     def doMove(self,velocity,distance,direction):
-        msg = "SLIDER_MOVE:%d,%d,%d\n"%(velocity,distance,direction)
+        msg = "SLIDER_MOVE:%.4f,%.4f,%d"%(velocity,distance,direction)
+        print(msg)
         self.linkerSlider.sendAction(msg)
 
     def doHome(self):
-        msg = "SLIDER_HOME:\n"
+        msg = "SLIDER_HOME:"
         self.linkerSlider.sendAction(msg)
 
     def takePhoto(self,pathFile):
@@ -77,5 +78,3 @@ class ServerA2M2(ServerSocketWrapper,QThread):
                 #self.closeConnections()
                 break
         print("Server Socket termina")
-
-        

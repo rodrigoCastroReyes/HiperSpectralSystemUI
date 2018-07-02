@@ -8,3 +8,6 @@ word = []
 				time.sleep(1)
 			#line = self.channel.readline()
 			#
+
+			time.sleep(1)
+		line = "SLIDER_MOVE_OK"

@@ -34,12 +34,12 @@ class StepsModeOperation(ModeOperation):
     def run(self):
         pathDir = r"C:\Users\BDI\Desktop\exp\prueba_"
         i = 0
-        n_images = 10
+        n_images = 200
         #self.context.server.doHome()
         #self.context.server.waitForSlider()
         while n_images > 0:
             pathFile = pathDir + str(i) + ".tif"
-            self.context.server.doMove(10,20,1)
+            self.context.server.doMove(10,0.089,1)
             self.context.server.waitForSlider()
             self.context.server.takePhoto(pathFile)
             self.context.server.waitForCameraThor()
@@ -186,8 +186,8 @@ class ServerGUI(QMainWindow):
 	
     def onClickSliderMove(self):
         print("onMove")
-        velocity = int(self.velocityValue.text())
-        distance = int(self.distanceValue.text())
+        velocity = float(self.velocityValue.text())
+        distance = float(self.distanceValue.text())
         direction = int(self.directionValue.currentData())
         self.server.doMove(velocity,distance,direction)
         
