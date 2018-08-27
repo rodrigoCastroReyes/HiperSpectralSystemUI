@@ -90,11 +90,8 @@ class SerialSlider(Slider):
 		self.context = context
 
 	def run(self):
+		start_time = time.time()
 		self.send(self.action)
-		print(self.action)
-		print("waiting for serial")
-		#tdata = self.channel.read()
-		#print("waiting for serial 2")
 		while (True):
 			self.channel.reset_input_buffer()
 			line = self.channel.readline()
@@ -104,10 +101,9 @@ class SerialSlider(Slider):
 			print("enviado por slider",line)
 			if line == "SLIDER_MOVE_OK" or line=="SLIDER_STOP_OK":
 				break
-		print("sending message")
 		self.context.send(line)
-		print("message sent")
-		#wait for response
+		print("--- %s seconds ---" % (time.time() - start_time))
+
 		
 	def send(self,msg):
 		msg = msg + "\n"

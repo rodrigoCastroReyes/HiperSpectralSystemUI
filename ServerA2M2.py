@@ -20,6 +20,7 @@ class ServerA2M2(ServerSocketWrapper,QThread):
         self.linkerSlider.sendAction(msg)
 
     def doMove(self,velocity,distance,direction):
+
         msg = "SLIDER_MOVE:%.4f,%.4f,%d"%(velocity,distance,direction)
         print(msg)
         self.linkerSlider.sendAction(msg)
@@ -28,16 +29,28 @@ class ServerA2M2(ServerSocketWrapper,QThread):
         msg = "SLIDER_HOME:"
         self.linkerSlider.sendAction(msg)
 
+    def startVideo(self,pathDir):
+        msg = "THOR_START_VIDEO:" + pathDir
+        print (msg)
+        self.linkerThor.sendAction(msg)
+
+    def endVideo(self):
+        msg = "THOR_END_VIDEO:"
+        print(msg)
+        self.linkerThor.sendAction(msg)
+
     def takePhoto(self,pathFile):
         msg = "THOR_CAPTURE:" + pathFile
         print (msg)
         self.linkerThor.sendAction(msg)
 
     def waitForSlider(self):
+
         self.sliderMutex.lock()
         print("wait for slider response")
         self.sliderCondition.wait(self.sliderMutex)
         self.sliderMutex.unlock()
+
         print("slider response has arrived")
 
     def waitForCameraThor(self):

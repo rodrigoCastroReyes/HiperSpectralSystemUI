@@ -23,6 +23,7 @@ class Linker(QThread):
 		self.messages[msg] = action
 
 	def sendAction(self,msg):
+		print("send action ", msg)
 		try:
 			if self.connection:
 				self.connection.send(msg)
@@ -57,12 +58,14 @@ class LinkerThor(Linker):
 		print("Thor has responded")
 
 	def captureACK(self,result):
+		#cuando llega un mensaje de ack, notifica sobre el evento al servidor
 		if result:
 			self.notify()
 
 	def configureMessages(self):
 		self.addMessage("THOR_CONNECT", lambda: self.printMessage())
 		self.addMessage("THOR_CAPTURE_OK",lambda : self.captureACK(True))
+		self.addMessage("THOR_CAPTURE_OK2", lambda: self.captureACK(True))
 
 class LinkerSlider(Linker):
 

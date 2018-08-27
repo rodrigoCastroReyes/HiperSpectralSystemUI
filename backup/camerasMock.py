@@ -28,6 +28,12 @@ class ClientMock(threading.Thread):
 						t = random.randint(2, 5) 
 						time.sleep(t)
 						self.connection.send(("THOR_CAPTURE_OK").encode())
+					elif command == "THOR_START_VIDEO":
+						time.sleep(30)
+						self.connection.send(("THOR_CAPTURE_OK").encode())
+					elif command == "THOR_END_VIDEO":
+						time.sleep(30)
+						self.connection.send(("THOR_CAPTURE_OK").encode())
 		except KeyboardInterrupt:
    			print('interrupted!')
 
