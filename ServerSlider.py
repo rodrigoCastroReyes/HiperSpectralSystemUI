@@ -27,7 +27,12 @@ class SliderSocket(ClientSocket,QThread):
 				if self.slider.isRunning():
 					self.slider.terminate()
 					self.slider.wait(100)
-				self.slider.setAction(msg,self)
+				if command == 'SLIDER_STOP':
+					args = msg.split(":")[1]
+					print command,args
+					self.slider.setAction(command,self,args=args)
+				else:
+					self.slider.setAction(command,self)
 				self.slider.start()
 
 def loadConfiguration(filename):
@@ -40,19 +45,24 @@ if __name__ == '__main__':
 	filename = "config.json"
 	app = QApplication(sys.argv)
 	config = loadConfiguration(filename)
-	velocity = config["velocity"]
-	offset = config["offset"]
-	distance = config["distance"]
 	device = config['device'] 
 	ip = config["ip"]
 	port = int(config["port"])
+	type = config["type"]
 
-	slider = SerialSlider(velocity,offset,distance)
+	if type == "serial":
+		slider = SerialSlider()
+		if(slider.init(device)):
+			client = SliderSocket(slider)
+			client.connect(ip,port)
+			client.start()
+		else:
+			print("No se puede conectar a %s"%(device))
 	
-	if(slider.init(device)):
+	elif type == "linuxcnc":
+		slider = CNCSlider()
 		client = SliderSocket(slider)
 		client.connect(ip,port)
 		client.start()
-	else:
-		print("No se puede conectar a %s"%(device))
+
 	sys.exit(app.exec_())
