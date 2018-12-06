@@ -2,7 +2,7 @@
 	"config": {
 		"name": "Server RIP",
 		"ip": "127.0.0.1",
-		"port":"9090",
+		"port":"666",
 		"device" : "COM6",
 		"velocity": 4.37,
 		"distance": 100,

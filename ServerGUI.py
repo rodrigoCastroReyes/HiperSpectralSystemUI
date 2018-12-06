@@ -19,6 +19,7 @@ from rx import Observable
 from rx.concurrency import NewThreadScheduler
 import qtmodern.styles
 import qtmodern.windows
+import time
 
 class ModeOperation(QThread):
 
@@ -62,18 +63,22 @@ class StepsModeOperation(ModeOperation):
         pathDir = self.context.getThorDirectory()
         print ("Escribiendo datos en %s "%(pathDir))
         i = 0
-        n_images = 200
+        n_images = 650
         #self.context.server.doHome()
         #self.context.server.waitForSlider()
         while n_images > 0:
             pathFile = os.path.join(pathDir,str(i) + ".tif")
-            self.context.server.doMove(10,0.03928,-1)
+            self.context.server.doMove(0.48245,0.4,1)#se mueve 0.4mm
             self.context.server.waitForSlider()
+
+            time.sleep(1.5)
+
             self.context.server.takePhoto(pathFile)
             self.context.server.waitForCameraThor()
             n_images-=1
             i+=1
-        self.context.server.endCapture()
+
+        #self.context.server.endCapture()
 
 class ServerGUI(QMainWindow):
 
@@ -92,6 +97,7 @@ class ServerGUI(QMainWindow):
         config = data["config"]
         self.ip = config["ip"]
         self.port = int(config["port"])
+        print (config)
 
     def onClickSelectPath(self):
         #QFileDialog.getExistingDirectory(self, 'Select directory')
@@ -106,7 +112,7 @@ class ServerGUI(QMainWindow):
     def onClickCreate(self):
         t = time.time()
         t_str = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(t))
-        t_str = self.lineEdit.text()+"/"+"Experimiento-" + t_str
+        t_str = self.lineEdit.text()+"/"+"Experimento-" + t_str
         self.experiment_directory = os.path.abspath(t_str)
         self.thor_directory = os.path.abspath(t_str + "/fotoThor/")
         self.calibration_directory = os.path.abspath(t_str + "/imagenesCalibracion/")
@@ -210,8 +216,10 @@ class ServerGUI(QMainWindow):
 
     def launch_upload_thread(self,my_ftp):
         local_parent_path = self.experiment_directory
-        folder_name = local_parent_path.split("/")[-1]
-        server_path = os.path.join("/home/rodfcast/Experimentos",folder_name)
+        parts = os.path.split(local_parent_path)
+        folder_name = parts[1]
+        server_path = "/home/obayona/Experimentos/"+folder_name
+        print ("server path",server_path)
         my_ftp.mkd(server_path)
         my_ftp.cwd(server_path)
         scheduler = NewThreadScheduler()
@@ -224,9 +232,9 @@ class ServerGUI(QMainWindow):
                        on_completed=lambda: my_ftp.close())
 
     def onClickUploadSession(self):
-        server = '127.0.0.1'
-        username = 'rodfcast'
-        password = '2487'
+        server = '200.126.1.152'
+        username = 'obayona'
+        password = 'EloyEcuador93'
         print("inicio de subida")
         my_ftp = FTP(server, username, password)
         self.launch_upload_thread(my_ftp)
@@ -251,6 +259,7 @@ class ServerGUI(QMainWindow):
             pathFile = os.path.join(directory,fileName)
             pathFile = os.path.abspath(pathFile)
             self.server.takePhoto(pathFile)
+            self.server.waitForCameraThor()
 
     def onClickSliderHome(self):
         print("onHome")
