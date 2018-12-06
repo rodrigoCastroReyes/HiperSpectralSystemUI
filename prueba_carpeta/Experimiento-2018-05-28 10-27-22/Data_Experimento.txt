@@ -1,2 +1,0 @@
-planta:d
-id:d

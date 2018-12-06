@@ -1,2 +1,0 @@
-id_hoja:1
-id_planta:1
