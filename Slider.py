@@ -6,18 +6,18 @@ from observable import Observable
 from PyQt5.QtCore import *
 import io
 import time
+from LinuxCNCMachine import *
 
 class SliderStates:
 	HOMED,READY,DONE = range(3)
 
 class Slider(Observable, QThread):
-	
-	def __init__(self, velocity, offset, distance, name ="Slider", parent=None):
+
+	def __init__(self, parent=None):
 		QThread.__init__(self, parent)
 		Observable.__init__(self)
-		self.velocity = velocity
-		self.offset = offset
-		self.distance = distance
+		self.velocity = 0
+		self.distance = 0
 		self.state = SliderStates.READY
 		self.name = name
 
@@ -47,33 +47,48 @@ class Slider(Observable, QThread):
 	def setVelocity(self,vel):
 		self.velocity = vel
 
-	def checkCurrentPosition(self):
+	def setAction(self,msg,context,args=None):
+		self.action = msg
+		self.context = context
+		self.args = args
+
+
+class CNCSlider(Slider):
+
+	def __init__(self):
+		super(CNCSlider, self).__init__()
+		self.controller = LinuxCNCMachine()
+
+	def do(self,action,args):
+		sleep(1)
+
+		if action == 'SLIDER_HOME':
+			print action
+
+		elif action == 'SLIDER_MOVE':
+			attr = args.split(',')
+			velocity = attr[0]
+			direction = attr[1]
+			step = attr[2]
+			self.controller.move(velocity,direction,step)
+
+		elif action == 'SLIDER_STOP':
+			self.controller.stopMoving()
+
+	def run(self):
+		self.do(self.action)
+		self.context.send("SLIDER_MOVE_OK")#notifica al servidor que ha terminado de efectuar la accion
+
+	def terminate(self):
 		pass
-		"""
-		currentPosition = self.getCurrentPosition()
-		firstStop = currentPosition + offset 
-		finalStop = currentPosition + offset + distance
-		while currentPosition <= finalStop:
-			print("slider serial checkin position")
-			currentPosition = self.getCurrentPosition()
-			if currentPosition == 0 :
-				self.setHome()#do home
-			if currentPosition >= firstStop:
-				if not(context.isReady()):
-					context.setReady() #do ready
-					#self.update_observers(state = MachineState.READY)
-			if currentPosition >= (finalStop - 1):
-				if not(context.isDone()):
-					context.setDone() #do done
-					#self.update_observers(state = MachineState.DONE)
-					break
-			self.position += 1
-		"""
+
+	def wait(self,time):
+		sleep(time)
 
 class SerialSlider(Slider):
 
-	def __init__(self, velocity, offset, distance):
-		super(SerialSlider, self).__init__(velocity, offset, distance)
+	def __init__(self):
+		super(SerialSlider, self).__init__()
 		self.position = 0
 
 	def init(self,device):
@@ -84,10 +99,6 @@ class SerialSlider(Slider):
 		except Exception as e:
 			print (e)
 			return False
-	
-	def setAction(self,msg,context):
-		self.action = msg
-		self.context = context
 
 	def run(self):
 		start_time = time.time()

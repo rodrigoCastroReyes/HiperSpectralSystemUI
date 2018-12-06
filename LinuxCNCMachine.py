@@ -5,21 +5,17 @@ User interfaces control LinuxCNC activity by sendind NML messages to the LinuxCN
 and monitor results by observing the LinuxCNC status structure
 
 """
-class LinuxCNCMachine(SliderStrategy):	
+class LinuxCNCMachine():	
 
-	def __init__(self,name,velocity=15.0,distance=100,timeout=2):
-		self.name = name
+	def __init__(self):
 		self.emc = linuxcnc
 		self.status = self.emc.stat()
 		self.command = self.emc.command()
 		self.error = self.emc.error_channel()
-		self.state = MachineState.HOMED
-		self.timeout = timeout
-		
-		self.distance = distance
-		self.aceleration = 8.0
+	
 		self.maxVelocity = 8.0
 		self.axis = 2
+
 		self.startCommand()
 		self.setModeCommand(linuxcnc.MODE_MANUAL)
 		self.doUnhome()
@@ -39,23 +35,18 @@ class LinuxCNCMachine(SliderStrategy):
 
 	def startCommand(self):
 		self.status.poll()
-		if self.status.task_state==linuxcnc.STATE_ESTOP:
+		if self.status.task_state == linuxcnc.STATE_ESTOP:
 			self.setStateCommand(linuxcnc.STATE_ESTOP_RESET)
 			sleep(0.25)
 			self.setStateCommand(linuxcnc.STATE_ON)
 			sleep(0.25)
-		if self.status.task_state==linuxcnc.STATE_ESTOP_RESET:
+		if self.status.task_state == linuxcnc.STATE_ESTOP_RESET:
 			self.setStateCommand(linuxcnc.STATE_ON)
 			sleep(0.25)
 
-
-	def setDistance(self,dist):
-		self.distance = dist
-
-
 	def setStateCommand(self,state):
 		self.status.poll()#method to update current status attributes.
-		if self.status.task_state!=state:
+		if self.status.task_state != state:
 			self.command.state(state)       
 
 	def getStateCommand(self):
@@ -70,9 +61,9 @@ class LinuxCNCMachine(SliderStrategy):
 		self.status.poll()
 		return self.status.axis[axismask]['homed']
 
-	def waitToComplete(self,velocity_home = 15.0,delay=1):
+	def waitToComplete(self,velocity,delay=1):
 		distance = abs(self.getCurrentPosition())
-		timeout = distance/velocity_home + delay
+		timeout = distance/velocity + delay
 		sleep(timeout)
 		self.resetCommand()
 
@@ -93,18 +84,19 @@ class LinuxCNCMachine(SliderStrategy):
 
 	def getCurrentPosition(self, axismask = 2):
 		self.status.poll()
-		return int(self.status.position[2])
+		return self.status.position[axismask]
 
-	def move(self, offset, axismask = 2, delay = 1):
-		print "velocity %.2f"%(self.velocity)
+	def move(self,velocity, direction, step, axismask = 2, delay = 1):
 		self.status.poll()
-		self.timeout = 0.0
-		distance = self.distance + offset
 		self.setStateCommand(linuxcnc. STATE_ON)
-		self.command.jog(linuxcnc.JOG_INCREMENT,axismask,self.velocity,distance)
+		self.command.jog(linuxcnc.JOG_INCREMENT,axismask,direction*velocity,step)
+		self.waitToComplete()
 
 	def moveContinuous(self,direction,axismask=2):
+		self.status.poll()
+		self.setStateCommand(linuxcnc. STATE_ON)
 		self.command.jog(linuxcnc.JOG_CONTINUOUS,axismask,direction*self.maxVelocity)
+		self.waitToComplete()
 
 	def goOn(self):
 		self.moveContinuous(1)
