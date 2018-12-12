@@ -69,15 +69,13 @@ class StepsModeOperation(ModeOperation):
         pathDir = self.context.getThorDirectory()
         print ("Escribiendo datos en %s "%(pathDir))
         i = 0
-        n_images = 650
-        velocity = 0.48245
-        spatial_resolution= 0.4
-        direction = 1
+        n_images = 650 #CAMBIAR EN 1 SENTIDO USUARIO INGRE DISTANCIA EN MM 
+        #N IMAGENES= DITANCIA EN MM DIVIDIDO PARA PASO
         #self.context.server.doHome()
         #self.context.server.waitForSlider()
         while n_images > 0:
             pathFile = os.path.join(pathDir,str(i) + ".tif")
-            self.context.server.doMove(velocity,spatial_resolution,direction)#se mueve 0.4mm
+            self.context.server.doMove(0.48245,0.4,1)#se mueve 0.4mm velocidad,paso,direccion
             self.context.server.waitForSlider()
 
             time.sleep(1.5)
