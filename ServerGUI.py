@@ -1,17 +1,12 @@
 import sys
 import os
-import Config
 import json
 import time
 from PyQt5.QtCore import Qt
 from PyQt5.QtCore import pyqtSlot
-import Config, inspect, os, sys, json, time
 from PyQt5.QtWidgets import QMainWindow,QApplication, QFileDialog,QWidget,QTableWidgetItem
 from PyQt5.uic import loadUi
-from ServerSocketWrapper import *
-from SocketWrapper import *
 from PyQt5.QtGui import QIcon
-from ServerA2M2 import *
 from pathlib import Path
 from datetime import datetime
 from ftplib import FTP
@@ -20,6 +15,16 @@ from rx.concurrency import NewThreadScheduler
 import qtmodern.styles
 import qtmodern.windows
 import time
+
+import Config, inspect, os, sys, json, time
+
+from ServerA2M2 import *
+from communication.ServerSocketWrapper import *
+from communication.SocketWrapper import *
+
+UI_PATH = './files/interfaz.ui'
+CONFIG_PATH = "./files/config_server.json"
+
 
 class ModeOperation(QThread):
 
@@ -41,9 +46,10 @@ class ContinuosModeOperation(ModeOperation):
     def run(self):
         pathDir = self.context.getThorDirectory()
         print("Escribiendo datos en %s " % (pathDir))
+        velocity = 10
         distance = 16
         direction = 1
-        self.context.server.doMove(10, distance, direction)
+        self.context.server.doMove(velocity, distance, direction)
         self.context.server.startVideo(pathDir)
         self.context.server.waitForSlider()
         self.context.server.endVideo()
@@ -64,11 +70,14 @@ class StepsModeOperation(ModeOperation):
         print ("Escribiendo datos en %s "%(pathDir))
         i = 0
         n_images = 650
+        velocity = 0.48245
+        spatial_resolution= 0.4
+        direction = 1
         #self.context.server.doHome()
         #self.context.server.waitForSlider()
         while n_images > 0:
             pathFile = os.path.join(pathDir,str(i) + ".tif")
-            self.context.server.doMove(0.48245,0.4,1)#se mueve 0.4mm
+            self.context.server.doMove(velocity,spatial_resolution,direction)#se mueve 0.4mm
             self.context.server.waitForSlider()
 
             time.sleep(1.5)
@@ -84,10 +93,10 @@ class ServerGUI(QMainWindow):
 
     def __init__(self, *args):
         super(ServerGUI, self).__init__(*args)
-        loadUi('interfaz.ui', self)
+        loadUi(UI_PATH, self)
         self.experiment_directory = ""
         self.initUIComponents()
-        self.loadConfiguration("config_server.json")
+        self.loadConfiguration(CONFIG_PATH)
         self.server = ServerA2M2(self.ip,self.port)
         self.server.start()
 
@@ -182,7 +191,7 @@ class ServerGUI(QMainWindow):
         self.uploadSessionButton.clicked.connect(self.onClickUploadSession)
 
         default_file = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
-        connection_file = open(default_file + "/parametros.json", 'r')
+        connection_file = open(default_file + "/files/parametros.json", 'r')
         conn_string = json.load(connection_file)
         connection_file.close()
         self.tableWidget.setRowCount(len(conn_string["parametros"]))
@@ -245,6 +254,8 @@ class ServerGUI(QMainWindow):
         self.mode = StepsModeOperation()
         #self.mode = ContinuosModeOperation()
         self.mode.doScanner(self)
+        #self.mode.join()
+        #join hasta que mode termine
 
     def onClickCameraCapture(self):
         fileNameBase = self.cameraThorNameFiles.text()#validar que sea un nombre valido

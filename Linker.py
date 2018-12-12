@@ -1,4 +1,4 @@
-from SocketWrapper import *
+from communication.SocketWrapper import *
 from PyQt5.QtCore import QThread
 
 class Linker(QThread):

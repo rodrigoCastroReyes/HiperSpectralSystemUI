@@ -1,6 +1,6 @@
 from PyQt5.QtCore import QThread,QMutex,QWaitCondition
 import socket
-from ServerSocketWrapper import *
+from communication.ServerSocketWrapper import *
 from Linker import *
 
 class ServerA2M2(ServerSocketWrapper,QThread):
@@ -20,7 +20,6 @@ class ServerA2M2(ServerSocketWrapper,QThread):
         self.linkerSlider.sendAction(msg)
 
     def doMove(self,velocity,distance,direction):
-
         msg = "SLIDER_MOVE:%.4f,%.4f,%d"%(velocity,distance,direction)
         print(msg)
         self.linkerSlider.sendAction(msg)
