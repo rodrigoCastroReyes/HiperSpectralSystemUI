@@ -46,10 +46,10 @@ class ContinuosModeOperation(ModeOperation):
     def run(self):
         pathDir = self.context.getThorDirectory()
         print("Escribiendo datos en %s " % (pathDir))
-        velocity = 10
-        distance = 16
+        #velocity = 10
+        #distance = 16
         direction = 1
-        self.context.server.doMove(velocity, distance, direction)
+        self.context.server.doMove(self.context.velocity,self.context.distance, direction)
         self.context.server.startVideo(pathDir)
         self.context.server.waitForSlider()
         self.context.server.endVideo()
@@ -75,7 +75,7 @@ class StepsModeOperation(ModeOperation):
         #self.context.server.waitForSlider()
         while n_images > 0:
             pathFile = os.path.join(pathDir,str(i) + ".tif")
-            self.context.server.doMove(0.48245,0.4,1)#se mueve 0.4mm velocidad,paso,direccion
+            self.context.server.doMove(self.context.velocity,self.context.distance,1)#se mueve 0.4mm velocidad,paso,direccion
             self.context.server.waitForSlider()
 
             time.sleep(1.5)
@@ -104,6 +104,8 @@ class ServerGUI(QMainWindow):
         config = data["config"]
         self.ip = config["ip"]
         self.port = int(config["port"])
+        self.velocity = float(config["velocity"])
+        self.distance = float(config["distance"])
         print (config)
 
     def onClickSelectPath(self):
