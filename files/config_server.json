@@ -2,6 +2,8 @@
 	"config": {
 		"name": "Server RIP",
 		"ip": "200.126.1.162",
-		"port":"666"
+		"port":"666",
+		"velocity":"0.48245",
+		"distance":"0.4"
 	}
 }

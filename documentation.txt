@@ -1,0 +1,17 @@
+Movimiento del slider
+ServerGUI usa las clases:
+*ContinuousModeOperation
+*StepsModeOperation
+Ambas clases usan, dentro de run(), la función doMove()
+
+doMove(velocity, distance, direction)
+Implementada en ServerA2M2. Le manda un mensaje con sendAction() al LinkerSlider.LinkerSlider hereda de Linker.
+
+sendAction(self,msg)
+Implementada en Linker. Si hay una conexión, envía el mensaje a través de la misma.
+
+Conexión FTP
+ServerGUI tiene las funciones:
+upload_files(self,parent_path,server_path,my_ftp), usada por launch_upload_thread.
+launch_upload_thread(self,my_ftp), usada por onClickUpload.
+onClickUploadSession(self)
