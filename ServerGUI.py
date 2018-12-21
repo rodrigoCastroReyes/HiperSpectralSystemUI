@@ -225,7 +225,7 @@ class ServerGUI(QMainWindow):
         local_parent_path = self.experiment_directory
         parts = os.path.split(local_parent_path)
         folder_name = parts[1]
-        server_path = "/home/obayona/Experimentos/"+folder_name
+        server_path = "/home/obayona/Cacao_Experimentos/"+folder_name
         print ("server path",server_path)
         my_ftp.mkd(server_path)
         my_ftp.cwd(server_path)

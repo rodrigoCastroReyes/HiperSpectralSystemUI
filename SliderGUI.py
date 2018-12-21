@@ -104,7 +104,7 @@ class SliderUI(QMainWindow):
         #print('Experimento-%Y-%m-%d %H-%M-%S}'.format(datetime(2001, 2, 3, 4, 5)))
         t = time.time()
         t_str = time.strftime('%Y-%m-%d %H-%M-%S', time.localtime(t))
-        t_str=self.lineEdit.text()+"/"+"Experimiento-" + t_str
+        t_str=self.lineEdit.text()+"/"+"Experimento-" + t_str
         print(t_str)
         if not os.path.exists(t_str):
             os.makedirs(t_str)
